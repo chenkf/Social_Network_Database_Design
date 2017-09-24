@@ -76,8 +76,7 @@ CREATE TABLE Events(
 	EVENT_END TIMESTAMP,
 	PRIMARY KEY (EVENT_ID),
 	FOREIGN KEY (EVENT_CREATOR_ID) REFERENCES USERS(USER_ID) ON DELETE CASCADE,
-	FOREIGN KEY (EVENT_CITY_ID) REFERENCES CITIES(CITY_ID) ON DELETE CASCADE,
-
+	FOREIGN KEY (EVENT_CITY_ID) REFERENCES CITIES(CITY_ID) ON DELETE CASCADE
 );
 
 CREATE TABLE PARTICIPANTS(
@@ -92,52 +91,53 @@ CREATE TABLE PARTICIPANTS(
 
 CREATE TABLE Messages 
 (
-message_id INTEGER,
-sender_id INTEGER,
-receiver_id INTEGER,
-message_content VARCHAR2(2000),
-sent_time TIMESTAMP,
-PRIMARY KEY(message_id),
-FOREIGN KEY(sender_id) REFERENCES Users(user_id),
-FOREIGN KEY(receiver_id) REFERENCES Users(user_id)
+	message_id INTEGER,
+	sender_id INTEGER,
+	receiver_id INTEGER,
+	message_content VARCHAR2(2000),
+	sent_time TIMESTAMP,
+	PRIMARY KEY(message_id),
+	FOREIGN KEY(sender_id) REFERENCES Users(user_id),
+	FOREIGN KEY(receiver_id) REFERENCES Users(user_id)
 );
 
 
 CREATE TABLE Albums(
-album_id INTEGER,
-album_owner_id INTEGER NOT NULL,
-album_name VARCHAR2(100),
-album_created TIMESTAMP,
-album_modified TIMESTAMP, 
-album_link VARCHAR2(2000),
-album_visibility VARCHAR2(100),
-cover_photo_id INTEGER NOT NULL,
-PRIMARY KEY (album_id),
-FOREIGN KEY (album_owner_id) REFERENCES Users(user_id),
-CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('everyone', 'friends', 'friends of friends', 'myself', 'custom') )
+	album_id INTEGER,
+	album_owner_id INTEGER NOT NULL,
+	album_name VARCHAR2(100),
+	album_created TIMESTAMP,
+	album_modified TIMESTAMP, 
+	album_link VARCHAR2(2000),
+	album_visibility VARCHAR2(100),
+	cover_photo_id INTEGER NOT NULL,
+	PRIMARY KEY (album_id),
+	FOREIGN KEY (album_owner_id) REFERENCES Users(user_id),
+	CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('everyone', 'friends', 'friends of friends', 'myself', 'custom') )
 );
 
 CREATE TABLE Photos
-(photo_id INTEGER,
-album_id INTEGER NOT NULL,
-photo_caption VARCHAR2(2000),
-photo_created TIMESTAMP, 
-photo_modified TIMESTAMP, 
-photo_link VARCHAR2(2000),
-PRIMARY KEY(photo_id),
-FOREIGN KEY(album_id) REFERENCES Albums --constraint should satisfy: 1) each photo owned by exactly one album (also see primary key) 2) each album must have at least one photo
+(
+	photo_id INTEGER,
+	album_id INTEGER NOT NULL,
+	photo_caption VARCHAR2(2000),
+	photo_created TIMESTAMP, 
+	photo_modified TIMESTAMP, 
+	photo_link VARCHAR2(2000),
+	PRIMARY KEY(photo_id),
+	FOREIGN KEY(album_id) REFERENCES Albums --constraint should satisfy: 1) each photo owned by exactly one album (also see primary key) 2) each album must have at least one photo
 );
 
 
 CREATE TABLE Tags(
-tag_photo_id INTEGER,
-tag_subject_id INTEGER,
-tag_created TIMESTAMP,
-tag_x INTEGER,
-tag_y INTEGER,
-PRIMARY KEY(tag_photo_id, tag_subject_id),
-FOREIGN KEY(tag_photo_id) REFERENCES Photos(photo_id),
-FOREIGN KEY(tag_subject_id) REFERENCES Users(user_id)
+	tag_photo_id INTEGER,
+	tag_subject_id INTEGER,
+	tag_created TIMESTAMP,
+	tag_x INTEGER,
+	tag_y INTEGER,
+	PRIMARY KEY(tag_photo_id, tag_subject_id),
+	FOREIGN KEY(tag_photo_id) REFERENCES Photos(photo_id),
+	FOREIGN KEY(tag_subject_id) REFERENCES Users(user_id)
 );
 
 
