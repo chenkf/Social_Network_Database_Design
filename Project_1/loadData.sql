@@ -1,0 +1,12 @@
+CREATE SEQUENCE sequence seq1
+	START WITH 1
+	INCREMENT BY 1;
+
+
+CREATE TRIGGER trigger name
+	BEFORE INSERT ON table name
+		FOR EACH ROW
+			BEGIN
+				SELECT seq1.NEXTVAL INTO :NEW.id field FROM DUAL;
+			END;
+/
