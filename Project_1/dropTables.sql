@@ -1,0 +1,4 @@
+DROP TABLE Messages;
+DROP TABLE Photos;
+DROP TABLE Albums;
+DROP TABLE Tags;
