@@ -13,6 +13,8 @@ DROP TABLE Messages;
 DROP TABLE Photos;
 DROP TABLE Albums;
 
+DROP TABLE PARTICIPANTS;
+DROP TABLE Events;
 
 -- then, delete parent tables (or we can use CASCADE CONSTRAINTS )
 DROP TABLE USERS;
