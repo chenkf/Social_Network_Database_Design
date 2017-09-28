@@ -113,7 +113,7 @@ CREATE TABLE Albums(
 	cover_photo_id INTEGER NOT NULL,
 	PRIMARY KEY (album_id),
 	FOREIGN KEY (album_owner_id) REFERENCES Users(user_id),
-	CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('everyone', 'friends', 'friends of friends', 'myself', 'custom') )
+	CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('EVERYONE', 'FRIENDS', 'FRIENDS OF FRIENDS', 'MYSELF', 'CUSTOM') )
 );
 
 CREATE TABLE Photos
