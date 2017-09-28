@@ -76,29 +76,8 @@ WHERE u.INSTITUTION_NAME = p.INSTITUTION AND
 u.PROGRAM_CONCENTRATION = p.CONCENTRATION AND 
 u.PROGRAM_DEGREE = p.DEGREE;
 
---LOAD ALBUMS : place before loading data into photos table or else there will be integrity constraint because there is no foreign key (album_id) for the photos
-INSERT INTO Albums(
-	album_id, 
-	album_owner_id, 
-	album_name, 
-	album_created, 
-	album_modified, 
-	album_link, 
-	album_visibility, 
-	cover_photo_id)
-SELECT DISTINCT
-	ALBUM_ID, 
-	OWNER_ID, 
-	ALBUM_NAME, 
-	ALBUM_CREATED_TIME, 
-	ALBUM_MODIFIED_TIME, 
-	ALBUM_LINK, 
-	ALBUM_VISIBILITY, 
-	COVER_PHOTO_ID
-FROM jsoren.PUBLIC_PHOTO_INFORMATION
-WHERE ALBUM_VISIBILITY in ('EVERYONE', 'FRIENDS', 'FRIENDS OF FRIENDS', 'MYSELF', 'CUSTOM');
-
 --LOAD PHOTOS
+SET AUTOCOMMIT OFF
 INSERT INTO Photos(
 	photo_id, 
 	album_id, 
@@ -112,8 +91,35 @@ SELECT DISTINCT t1.PHOTO_ID,
 	t1.PHOTO_LINK
 FROM jsoren.PUBLIC_PHOTO_INFORMATION t1, ALBUMS t2
 WHERE t2.album_id IS NOT NULL 
-AND t1.album_id = t2.album_id; --foreign key integrity constraint
+AND t1.album_id = t2.album_id; 
+COMMIT;
+SET AUTOCOMMIT ON
 
+--LOAD ALBUMS
+SET AUTOCOMMIT OFF
+INSERT INTO Albums(
+	album_id, 
+	album_owner_id, 
+	album_name, 
+	album_created, 
+	album_modified, 
+	album_link, 
+	album_visibility, 
+	cover_photo_id)
+SELECT DISTINCT
+	t1.ALBUM_ID, 
+	t1.OWNER_ID, 
+	t1.ALBUM_NAME, 
+	t1.ALBUM_CREATED_TIME, 
+	t1.ALBUM_MODIFIED_TIME, 
+	t1.ALBUM_LINK, 
+	t1.ALBUM_VISIBILITY, 
+	t1.COVER_PHOTO_ID
+FROM jsoren.PUBLIC_PHOTO_INFORMATION t1, PHOTOS t2
+WHERE ALBUM_VISIBILITY in ('EVERYONE', 'FRIENDS', 'FRIENDS OF FRIENDS', 'MYSELF', 'CUSTOM')
+AND t1.COVER_PHOTO_ID = t2.photo_id;
+COMMIT;
+SET AUTOCOMMIT ON
 
 --LOAD TAGS
 INSERT INTO Tags(
