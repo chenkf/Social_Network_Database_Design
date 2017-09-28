@@ -60,8 +60,8 @@ SELECT
 	tag_photo_id,
 	tag_subject_id,
 	tag_created AS tag_created_time,
-	tag_x_coordinate,
-	tag_y_coordinate
+	tag_x AS tag_x_coordinate,
+	tag_y AS tag_y_coordinate
 FROM
 	Tags;
 
@@ -80,7 +80,7 @@ SELECT
 	t1.EVENT_CITY_ID,
 	t2.EVENT_STATE,
 	t2.EVENT_COUNTRY,
-	t1.EVENT_START,
-	t1.EVENT_END
+	t1.EVENT_START AS EVENT_START_TIME,
+	t1.EVENT_END AS EVENT_END_TIME
 FROM t2.Events, t2.CITIES
 WHERE t1.EVENT_CITY_ID = t2.EVENT_CITY_ID;
