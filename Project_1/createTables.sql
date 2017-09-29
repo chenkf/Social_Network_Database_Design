@@ -103,7 +103,7 @@ CREATE TABLE Messages
 );
 
 
-CREATE TABLE Albums(
+CREATE TABLE ALBUMS(
 	album_id INTEGER,
 	album_owner_id INTEGER NOT NULL,
 	album_name VARCHAR2(100),
@@ -117,7 +117,7 @@ CREATE TABLE Albums(
 	CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('EVERYONE', 'FRIENDS', 'FRIENDS OF FRIENDS', 'MYSELF', 'CUSTOM') )
 );
 
-CREATE TABLE Photos
+CREATE TABLE PHOTOS
 (
 	photo_id INTEGER,
 	album_id INTEGER NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE Photos
 );
 
 
-CREATE TABLE Tags(
+CREATE TABLE TAGS(
 	tag_photo_id INTEGER,
 	tag_subject_id INTEGER,
 	tag_created TIMESTAMP,
