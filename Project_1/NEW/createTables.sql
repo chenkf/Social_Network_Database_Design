@@ -177,7 +177,7 @@ CREATE TRIGGER add_program_id
 CREATE TRIGGER friendship_uniqueness
 	BEFORE INSERT ON FRIENDS
 		FOR EACH ROW
-			DECLARE recip_check number;
+			DECLARE temp number;
 			BEGIN
 			    IF :NEW.USER1_ID < :NEW.USER2_ID 
 			    THEN 
