@@ -15,7 +15,7 @@ DROP TABLE Photos;
 DROP TABLE Albums;
 
 DROP TABLE PARTICIPANTS;
-DROP TABLE Events;
+DROP TABLE USER_EVENTS;
 
 -- then, delete parent tables (or we can use CASCADE CONSTRAINTS )
 DROP SEQUENCE seq1;
