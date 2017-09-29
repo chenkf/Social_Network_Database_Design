@@ -127,7 +127,7 @@ CREATE TABLE PHOTOS
 	photo_modified TIMESTAMP, 
 	photo_link VARCHAR2(2000),
 	PRIMARY KEY(photo_id),
-	UNIQUE (album_id), -- key constraint: each photo has at most one album; foreign key can be duplicated
+	--UNIQUE (album_id), -- key constraint: each photo has at most one album; foreign key can be duplicated
 	FOREIGN KEY(album_id) REFERENCES Albums --constraint should satisfy: 1) each photo owned by exactly one album (also see primary key) 2) each album must have at least one photo
 );
 
