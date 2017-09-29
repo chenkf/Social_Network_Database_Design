@@ -8,6 +8,21 @@ INSERT INTO FRIENDS(USER1_ID, USER2_ID)
 SELECT USER1_ID, USER2_ID
 FROM jsoren.PUBLIC_ARE_FRIENDS;
 
+CREATE TRIGGER friendship_uniqueness
+	BEFORE INSERT ON FRIENDS
+		FOR EACH ROW
+			DECLARE found_count number;
+			BEGIN
+				SELECT USER1_ID, USER2_ID INTO :NEW.USER1_ID, NEW.USER2_ID FROM DUAL;
+				-- SELECT COUNT(1) INTO found_count FROM pairing 
+			    WHERE (USER1_ID<>:NEW.USER2_ID AND USER2_ID<>:NEW.USER1_ID);
+			    -- IF found_count = 1 THEN
+			    --     RAISE_APPLICATION_ERROR(-20001, 'The pairing already exists');
+			    -- END IF;
+			END;
+/
+
+
 
 CREATE SEQUENCE seq1
 	START WITH 1
