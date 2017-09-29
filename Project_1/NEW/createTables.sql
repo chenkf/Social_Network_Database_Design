@@ -115,7 +115,7 @@ CREATE TABLE ALBUMS(
 	PRIMARY KEY (album_id),
 	FOREIGN KEY (album_owner_id) REFERENCES Users(user_id),
 	-- are we sure the visibility string are actually like that?
-	CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('EVERYONE', 'FRIENDS', 'FRIENDS OF FRIENDS', 'MYSELF', 'CUSTOM') )
+	CONSTRAINT CHK_ALBUM_VISIBILITY CHECK ( album_visibility in ('EVERYONE', 'FRIENDS', 'FRIENDS_OF_FRIENDS', 'MYSELF', 'CUSTOM') )
 );
 
 CREATE TABLE PHOTOS
@@ -174,17 +174,17 @@ CREATE TRIGGER add_program_id
 			END;
 /
 
--- CREATE TRIGGER friendship_uniqueness
--- 	BEFORE INSERT ON FRIENDS
--- 		FOR EACH ROW
--- 			DECLARE recip_check number;
--- 			BEGIN
--- 			    IF :NEW.USER1_ID < USER2_ID 
--- 			    THEN 
--- 				    INSERT INTO FRIENDS(USER1_ID, USER2_ID)
--- 					SELECT USER2_ID, USER1_ID
--- 					FROM jsoren.PUBLIC_ARE_FRIENDS
--- 			    END IF;
--- 			END;
--- /
+CREATE TRIGGER friendship_uniqueness
+	BEFORE INSERT ON FRIENDS
+		FOR EACH ROW
+			DECLARE recip_check number;
+			BEGIN
+			    IF :NEW.USER1_ID < :NEW.USER2_ID 
+			    THEN 
+				    temp = :NEW.USER1_ID
+				    :NEW.USER1_ID = :NEW.USER2_ID
+				    :NEW.USER2_ID = temp
+			    END IF;
+			END;
+/
 
