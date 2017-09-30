@@ -1,5 +1,5 @@
 CREATE TABLE USERS (
-	USER_ID INTEGER,
+	USER_ID NUMBER,
 	FIRST_NAME VARCHAR2(100),
 	LAST_NAME VARCHAR2(100),
 	YEAR_OF_BIRTH INTEGER,
@@ -10,8 +10,8 @@ CREATE TABLE USERS (
 );
 
 CREATE TABLE FRIENDS (
-	USER1_ID INTEGER,
-	USER2_ID INTEGER,
+	USER1_ID NUMBER,
+	USER2_ID NUMBER,
 	PRIMARY KEY (USER1_ID, USER2_ID),
 	FOREIGN KEY (USER1_ID) REFERENCES USERS(USER_ID),
 	FOREIGN KEY (USER2_ID) REFERENCES USERS(USER_ID),
@@ -86,11 +86,11 @@ CREATE TABLE PARTICIPANTS(
 	CONFIRMATION VARCHAR2(100) NOT NULL,
 	PRIMARY KEY (USER_ID, EVENT_ID),
 	FOREIGN KEY (EVENT_ID) REFERENCES USER_EVENTS(EVENT_ID),
-	CONSTRAINT CHK_CONFIRMATION CHECK ( CONFIRMATION in ('attending', 'unsure', 'declined','not replied') )
+	CONSTRAINT CHK_CONFIRMATION CHECK ( CONFIRMATION in ('ATTENDING', 'UNSURE', 'DECLINE','NOT-REPLIED') )
 );
 
 
-CREATE TABLE Messages 
+CREATE TABLE MESSAGE 
 (
 	message_id INTEGER,
 	sender_id INTEGER,
@@ -104,14 +104,14 @@ CREATE TABLE Messages
 
 
 CREATE TABLE ALBUMS(
-	album_id INTEGER,
-	album_owner_id INTEGER NOT NULL,
+	album_id NUMBER,
+	album_owner_id NUMBER NOT NULL,
 	album_name VARCHAR2(100),
 	album_created TIMESTAMP,
 	album_modified TIMESTAMP, 
 	album_link VARCHAR2(2000),
 	album_visibility VARCHAR2(100),
-	cover_photo_id INTEGER NOT NULL,
+	cover_photo_id NUMBER NOT NULL,
 	PRIMARY KEY (album_id),
 	FOREIGN KEY (album_owner_id) REFERENCES Users(user_id),
 	-- are we sure the visibility string are actually like that?
@@ -120,8 +120,8 @@ CREATE TABLE ALBUMS(
 
 CREATE TABLE PHOTOS
 (
-	photo_id INTEGER,
-	album_id INTEGER NOT NULL,
+	photo_id NUMBER,
+	album_id NUMBER NOT NULL,
 	photo_caption VARCHAR2(2000),
 	photo_created TIMESTAMP, 
 	photo_modified TIMESTAMP, 
@@ -181,9 +181,9 @@ CREATE TRIGGER friendship_uniqueness
 			BEGIN
 			    IF :NEW.USER1_ID < :NEW.USER2_ID 
 			    THEN 
-				    temp = :NEW.USER1_ID
-				    :NEW.USER1_ID = :NEW.USER2_ID
-				    :NEW.USER2_ID = temp
+				    temp := :NEW.USER1_ID;
+				    :NEW.USER1_ID := :NEW.USER2_ID;
+				    :NEW.USER2_ID := temp;
 			    END IF;
 			END;
 /
