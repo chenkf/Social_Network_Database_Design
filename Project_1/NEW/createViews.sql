@@ -48,8 +48,8 @@ SELECT
 	t1.album_visibility,
 	t2.photo_id,
 	t2.photo_caption,
-	t2.photo_created AS PHOTO_CREATED_TIME,
-	t2.photo_modified AS PHOTO_MODIFIED_TIME,
+	t2.photo_created_time,
+	t2.photo_modified_time,
 	t2.photo_link
 FROM Albums t1, Photos t2
 WHERE t1.album_id = t2.album_id;
@@ -57,7 +57,7 @@ WHERE t1.album_id = t2.album_id;
 --CREATE TAGS VIEW
 CREATE VIEW VIEW_TAG_INFORMATION AS
 SELECT 
-	tag_photo_id,
+	tag_photo_id AS photo_id,
 	tag_subject_id,
 	tag_created AS tag_created_time,
 	tag_x AS tag_x_coordinate,
