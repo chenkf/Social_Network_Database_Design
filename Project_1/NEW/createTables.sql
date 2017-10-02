@@ -124,9 +124,9 @@ CREATE TABLE PHOTOS
 	photo_id NUMBER,
 	album_id NUMBER NOT NULL,
 	photo_caption VARCHAR2(2000),
-	photo_created_time TIMESTAMP, 
+	photo_created_time TIMESTAMP NOT NULL, 
 	photo_modified_time TIMESTAMP, 
-	photo_link VARCHAR2(2000),
+	photo_link VARCHAR2(2000) NOT NULL,
 	PRIMARY KEY(photo_id),
 	FOREIGN KEY(album_id) REFERENCES Albums INITIALLY DEFERRED DEFERRABLE --constraint should satisfy: 1) each photo owned by exactly one album (also see primary key) 2) each album must have at least one photo
 );
@@ -135,9 +135,9 @@ CREATE TABLE PHOTOS
 CREATE TABLE TAGS(
 	tag_photo_id NUMBER,
 	tag_subject_id NUMBER,
-	tag_created TIMESTAMP,
-	tag_x NUMBER,
-	tag_y NUMBER,
+	tag_created TIMESTAMP NOT NULL,
+	tag_x NUMBER NOT NULL,
+	tag_y NUMBER NOT NULL,
 	PRIMARY KEY(tag_photo_id, tag_subject_id),
 	FOREIGN KEY(tag_photo_id) REFERENCES Photos(photo_id),
 	FOREIGN KEY(tag_subject_id) REFERENCES Users(user_id)
