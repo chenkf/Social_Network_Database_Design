@@ -157,7 +157,48 @@ public class MyFakebookOracle extends FakebookOracle {
     // (I.e., current_city != hometown_city)
     //
     public void liveAwayFromHome() throws SQLException {
-        this.liveAwayFromHome.add(new UserInfo(11L, "Heather", "Movalot"));
+        // You must refer to the following variables for the corresponding tables in your database
+        // String cityTableName = null;
+        // String userTableName = null;
+        // String friendsTableName = null;
+        // String currentCityTableName = null;
+        // String hometownCityTableName = null;
+        // String programTableName = null;
+        // String educationTableName = null;
+        // String eventTableName = null;
+        // String participantTableName = null;
+        // String albumTableName = null;
+        // String photoTableName = null;
+        // String coverPhotoTableName = null;
+        // String tagTableName = null;
+        try (Statement stmt =
+                     oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                             ResultSet.CONCUR_READ_ONLY)) {
+            // For each month, find the number of users born that month
+            // Sort them in descending order of count
+            ResultSet rst = stmt.executeQuery("SELECT u.USER_ID, u.FIRST_NAME, u.LAST_NAME FROM " +
+                    userTableName + " u, " + currentCityTableName + " ct, " + hometownCityTableName +
+                    " ht " +  
+                    "WHERE u.USER_ID = ct.USER_ID AND " +
+                    "ct.USER_ID = ht.USER_ID AND " +
+                    "ht.HOMETOWN_CITY_ID <> ct.CURRENT_CITY_ID " +
+                    "ORDER BY u.USER_ID");
+
+            while (rst.next()) { 
+                Long uid = rst.getLong(1);
+                String firstName = rst.getString(2);
+                String lastName = rst.getString(3);
+                this.liveAwayFromHome.add(new UserInfo(uid, firstName, lastName));
+            }
+
+            // Close statement and result set
+            rst.close();
+            stmt.close();
+        } catch (SQLException err) {
+            System.err.println(err.getMessage());
+        } 
+
+        
     }
 
     @Override
@@ -166,6 +207,8 @@ public class MyFakebookOracle extends FakebookOracle {
     // If there are ties, choose the photo with the smaller numeric PhotoID first
     //
     public void findPhotosWithMostTags(int n) {
+
+
         String photoId = "1234567";
         String albumId = "123456789";
         String albumName = "album1";
@@ -176,6 +219,26 @@ public class MyFakebookOracle extends FakebookOracle {
         tp.addTaggedUser(new UserInfo(12345L, "taggedUserFirstName1", "taggedUserLastName1"));
         tp.addTaggedUser(new UserInfo(12345L, "taggedUserFirstName2", "taggedUserLastName2"));
         this.photosWithMostTags.add(tp);
+
+
+        try (Statement stmt =
+             oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                     ResultSet.CONCUR_READ_ONLY)) {
+            // For each month, find the number of users born that month
+            // Sort them in descending order of count
+            ResultSet rst = stmt.executeQuery("");
+
+            while (rst.next()) { 
+               
+                this.liveAwayFromHome.add(new UserInfo(uid, firstName, lastName));
+            }
+
+            // Close statement and result set
+            rst.close();
+            stmt.close();
+        } catch (SQLException err) {
+            System.err.println(err.getMessage());
+        } 
     }
 
     @Override
