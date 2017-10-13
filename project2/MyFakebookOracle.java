@@ -157,20 +157,7 @@ public class MyFakebookOracle extends FakebookOracle {
     // (I.e., current_city != hometown_city)
     //
     public void liveAwayFromHome() throws SQLException {
-        // You must refer to the following variables for the corresponding tables in your database
-        // String cityTableName = null;
-        // String userTableName = null;
-        // String friendsTableName = null;
-        // String currentCityTableName = null;
-        // String hometownCityTableName = null;
-        // String programTableName = null;
-        // String educationTableName = null;
-        // String eventTableName = null;
-        // String participantTableName = null;
-        // String albumTableName = null;
-        // String photoTableName = null;
-        // String coverPhotoTableName = null;
-        // String tagTableName = null;
+
         try (Statement stmt =
                      oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
                              ResultSet.CONCUR_READ_ONLY)) {
@@ -208,31 +195,56 @@ public class MyFakebookOracle extends FakebookOracle {
     //
     public void findPhotosWithMostTags(int n) {
 
-
-        String photoId = "1234567";
-        String albumId = "123456789";
-        String albumName = "album1";
-        String photoCaption = "caption1";
-        String photoLink = "http://google.com";
-        PhotoInfo p = new PhotoInfo(photoId, albumId, albumName, photoCaption, photoLink);
-        TaggedPhotoInfo tp = new TaggedPhotoInfo(p);
-        tp.addTaggedUser(new UserInfo(12345L, "taggedUserFirstName1", "taggedUserLastName1"));
-        tp.addTaggedUser(new UserInfo(12345L, "taggedUserFirstName2", "taggedUserLastName2"));
-        this.photosWithMostTags.add(tp);
-
-
         try (Statement stmt =
              oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
                      ResultSet.CONCUR_READ_ONLY)) {
+
             // For each month, find the number of users born that month
             // Sort them in descending order of count
-            ResultSet rst = stmt.executeQuery("");
+            ResultSet rst = stmt.executeQuery("SELECT x.TAG_PHOTO_ID, p.ALBUM_ID, a.ALBUM_NAME, p.PHOTO_CAPTION, p.PHOTO_LINK " +
+            "FROM (SELECT t.TAG_PHOTO_ID, COUNT(TAG_SUBJECT_ID) AS NUM_TAGGED " +
+            "FROM " + tagTableName + " t " +
+            "GROUP BY t.TAG_PHOTO_ID " +
+            "ORDER BY NUM_TAGGED DESC, t.TAG_PHOTO_ID) x, " + photoTableName + " p, " + albumTableName + " a " +
+            "WHERE x.TAG_PHOTO_ID = p.PHOTO_ID " + 
+            "AND p.ALBUM_ID = a.ALBUM_ID " +
+            "AND ROWNUM <= " + n );
 
-            while (rst.next()) { 
-               
-                this.liveAwayFromHome.add(new UserInfo(uid, firstName, lastName));
+            int rsCount = 0;
+            while (rst.next()) {
+                String photoId = rst.getString(1);
+                String albumId = rst.getString(2);
+                String albumName = rst.getString(3);
+                String photoCaption = rst.getString(4);
+                String photoLink = rst.getString(5);
+                PhotoInfo p = new PhotoInfo(photoId, albumId, albumName, photoCaption, photoLink);
+                TaggedPhotoInfo tp = new TaggedPhotoInfo(p);
+
+                try (Statement stmt2 =
+                             oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                     ResultSet.CONCUR_READ_ONLY)) {
+
+                    ResultSet rst2 = stmt2.executeQuery("SELECT DISTINCT u.USER_ID, u.FIRST_NAME, u.LAST_NAME " +
+                    "FROM " + tagTableName + " t, " + userTableName + " u " +
+                    "WHERE t.TAG_SUBJECT_ID = u.USER_ID " +
+                    "AND t.TAG_PHOTO_ID = " + photoId);   
+
+                    while (rst2.next()) {
+                        Long uid = rst2.getLong(1);
+                        String firstname = rst2.getString(2);
+                        String lastname = rst2.getString(3);
+                        tp.addTaggedUser(new UserInfo(uid, firstname, lastname));
+                    }  
+
+                    this.photosWithMostTags.add(tp);
+
+                    // Close statement and result set
+                    rst2.close();
+                    stmt2.close();
+                } catch (SQLException err) {
+                    System.err.println(err.getMessage());
+                } 
             }
-
             // Close statement and result set
             rst.close();
             stmt.close();
@@ -256,24 +268,99 @@ public class MyFakebookOracle extends FakebookOracle {
     // (iii) If there are still ties, choose the pair with the smaller user2_id
     //
     public void matchMaker(int n, int yearDiff) {
-        Long u1UserId = 123L;
-        String u1FirstName = "u1FirstName";
-        String u1LastName = "u1LastName";
-        int u1Year = 1988;
-        Long u2UserId = 456L;
-        String u2FirstName = "u2FirstName";
-        String u2LastName = "u2LastName";
-        int u2Year = 1986;
-        MatchPair mp = new MatchPair(u1UserId, u1FirstName, u1LastName,
-                u1Year, u2UserId, u2FirstName, u2LastName, u2Year);
-        String sharedPhotoId = "12345678";
-        String sharedPhotoAlbumId = "123456789";
-        String sharedPhotoAlbumName = "albumName";
-        String sharedPhotoCaption = "caption";
-        String sharedPhotoLink = "link";
-        mp.addSharedPhoto(new PhotoInfo(sharedPhotoId, sharedPhotoAlbumId,
-                sharedPhotoAlbumName, sharedPhotoCaption, sharedPhotoLink));
-        this.bestMatches.add(mp);
+
+
+        try (Statement stmt =
+                     oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                             ResultSet.CONCUR_READ_ONLY)) {
+            // approach 1
+            ResultSet rst = stmt.executeQuery("SELECT x.USER1_ID, x.USER1_FIRST_NAME, x.USER1_LAST_NAME, x.USER1_YEAR_OF_BIRTH, x.USER2_ID, x.USER2_FIRST_NAME, x.USER2_LAST_NAME, x.USER2_YEAR_OF_BIRTH, COUNT(*) NUM_SHARED_PHOTOS " +
+                "FROM (SELECT DISTINCT u1.USER_ID USER1_ID, u1.FIRST_NAME USER1_FIRST_NAME, u1.LAST_NAME USER1_LAST_NAME, u1.YEAR_OF_BIRTH USER1_YEAR_OF_BIRTH, u2.USER_ID USER2_ID, u2.FIRST_NAME USER2_FIRST_NAME, u2.LAST_NAME USER2_LAST_NAME, u2.YEAR_OF_BIRTH USER2_YEAR_OF_BIRTH " +
+                    "FROM " + friendsTableName + " f, " + userTableName + " u1, " + userTableName + " u2, " + tagTableName + " t1, " + tagTableName + " t2 " +
+                    "WHERE u1.USER_ID = t1.TAG_SUBJECT_ID " +
+                    "AND u2.USER_ID = t2.TAG_SUBJECT_ID " +
+                    "AND t1.TAG_PHOTO_ID = t2.TAG_PHOTO_ID " +
+                    "AND u1.GENDER = u2.GENDER " +
+                    "AND ABS(u1.YEAR_OF_BIRTH - u2.YEAR_OF_BIRTH) <= " + yearDiff + " " + 
+                    // -- There are 4 cases
+                    "AND u1.USER_ID < u2.USER_ID " +
+                    "AND ((f.USER1_ID = u1.USER_ID AND f.USER2_ID != u2.USER_ID) OR (f.USER2_ID = u2.USER_ID AND f.USER1_ID != u1.USER_ID)) ) x, " + tagTableName + " t3, " + tagTableName + " t4 " + 
+                "WHERE x.USER1_ID = t3.TAG_SUBJECT_ID " +
+                "AND x.USER2_ID = t4.TAG_SUBJECT_ID " +
+                "AND t3.TAG_PHOTO_ID = t4.TAG_PHOTO_ID " +
+                "AND ROWNUM <= " + n + " " + 
+                "GROUP BY x.USER1_ID, x.USER1_FIRST_NAME, x.USER1_LAST_NAME, x.USER1_YEAR_OF_BIRTH, x.USER2_ID, x.USER2_FIRST_NAME, x.USER2_LAST_NAME, x.USER2_YEAR_OF_BIRTH " +
+                "ORDER BY NUM_SHARED_PHOTOS DESC, USER1_ID, USER2_ID");
+
+            // approach 2 
+            // ResultSet rst = stmt.executeQuery("SELECT DISTINCT u1.USER_ID USER1_ID, u1.FIRST_NAME USER1_FIRST_NAME, u1.LAST_NAME USER1_LAST_NAME, u1.YEAR_OF_BIRTH USER1_YEAR_OF_BIRTH, u2.USER_ID USER2_ID, u2.FIRST_NAME USER2_FIRST_NAME, u2.LAST_NAME USER2_LAST_NAME, u2.YEAR_OF_BIRTH USER2_YEAR_OF_BIRTH, COUNT(DISTINCT t1.TAG_SUBJECT_ID) NUM_SHARED_PHOTOS " +
+            //     "FROM " + friendsTableName + " f, " + userTableName + " u1, " + userTableName + " u2, " + tagTableName + " t1, " + tagTableName + " t2 " +
+            //     "WHERE u1.USER_ID = t1.TAG_SUBJECT_ID " +
+            //     "AND u2.USER_ID = t2.TAG_SUBJECT_ID " +
+            //     "AND t1.TAG_PHOTO_ID = t2.TAG_PHOTO_ID " +
+            //     "AND u1.GENDER = u2.GENDER " +
+            //     "AND ABS(u1.YEAR_OF_BIRTH - u2.YEAR_OF_BIRTH) <= " + yearDiff + " " +
+            //     // -- There are 4 cases
+            //     "AND u1.USER_ID < u2.USER_ID " +
+            //     "AND ((f.USER1_ID = u1.USER_ID AND f.USER2_ID != u2.USER_ID) OR (f.USER2_ID = u2.USER_ID AND f.USER1_ID != u1.USER_ID)) " +
+            //     "AND ROWNUM <= " + n + " " +
+            //     "GROUP BY u1.USER_ID, u1.FIRST_NAME, u1.LAST_NAME, u1.YEAR_OF_BIRTH, u2.USER_ID, u2.FIRST_NAME, u2.LAST_NAME, u2.YEAR_OF_BIRTH " +
+            //     "ORDER BY NUM_SHARED_PHOTOS DESC, USER1_ID, USER2_ID");
+
+
+
+            while (rst.next()) { 
+                Long u1UserId = rst.getLong(1);
+                String u1FirstName = rst.getString(2);
+                String u1LastName = rst.getString(3);
+                int u1Year = rst.getInt(4);
+                Long u2UserId = rst.getLong(5);
+                String u2FirstName = rst.getString(6);
+                String u2LastName = rst.getString(7);
+                int u2Year = rst.getInt(8);
+                MatchPair mp = new MatchPair(u1UserId, u1FirstName, u1LastName,
+                        u1Year, u2UserId, u2FirstName, u2LastName, u2Year);
+
+                try (Statement stmt2 =
+                             oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                                     ResultSet.CONCUR_READ_ONLY)) {
+
+                    ResultSet rst2 = stmt2.executeQuery("SELECT DISTINCT p.PHOTO_ID, p.ALBUM_ID, a.ALBUM_NAME, p.PHOTO_CAPTION, p.PHOTO_LINK " +
+                        "FROM " + tagTableName + " t1, " + tagTableName + " t2, " + photoTableName + " p, " + albumTableName + " a " +
+                        "WHERE t1.TAG_SUBJECT_ID = " + u1UserId + " " + 
+                        "AND t2.TAG_SUBJECT_ID = " + u2UserId + " " + 
+                        "AND t1.TAG_PHOTO_ID = t2.TAG_PHOTO_ID " +
+                        "AND t1.TAG_PHOTO_ID = p.PHOTO_ID " +
+                        "AND p.ALBUM_ID = a.ALBUM_ID");
+                    
+                    while (rst2.next()) {
+                        String sharedPhotoId = rst2.getString(1);
+                        String sharedPhotoAlbumId = rst2.getString(2);
+                        String sharedPhotoAlbumName = rst2.getString(3);
+                        String sharedPhotoCaption = rst2.getString(4);
+                        String sharedPhotoLink = rst2.getString(5);
+                        mp.addSharedPhoto(new PhotoInfo(sharedPhotoId, sharedPhotoAlbumId,
+                                sharedPhotoAlbumName, sharedPhotoCaption, sharedPhotoLink));
+                    }  
+
+                    this.bestMatches.add(mp);
+                    // Close statement and result set
+                    rst2.close();
+                    stmt2.close();
+                } catch (SQLException err) {
+                    System.err.println(err.getMessage());
+                } 
+            }
+
+
+            // Close statement and result set
+            rst.close();
+            stmt.close();
+        } catch (SQLException err) {
+            System.err.println(err.getMessage());
+        } 
+
+
     }
 
     // **** Query 6 ****
@@ -303,6 +390,7 @@ public class MyFakebookOracle extends FakebookOracle {
         p.addSharedFriend(678L, "sharedFriend2FirstName", "sharedFriend2LastName");
         p.addSharedFriend(789L, "sharedFriend3FirstName", "sharedFriend3LastName");
         this.suggestedUsersPairs.add(p);
+
     }
 
     @Override
@@ -341,14 +429,52 @@ public class MyFakebookOracle extends FakebookOracle {
     //
     //
     public void findPotentialSiblings() {
-        Long user1_id = 123L;
-        String user1FirstName = "User1FirstName";
-        String user1LastName = "User1LastName";
-        Long user2_id = 456L;
-        String user2FirstName = "User2FirstName";
-        String user2LastName = "User2LastName";
-        SiblingInfo s = new SiblingInfo(user1_id, user1FirstName, user1LastName, user2_id, user2FirstName, user2LastName);
-        this.siblings.add(s);
+
+        try (Statement stmt =
+             oracleConnection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+                     ResultSet.CONCUR_READ_ONLY)) {
+        // String cityTableName = null;
+        // String userTableName = null;
+        // String friendsTableName = null;
+        // String currentCityTableName = null;
+        // String hometownCityTableName = null;
+        // String programTableName = null;
+        // String educationTableName = null;
+        // String eventTableName = null;
+        // String participantTableName = null;
+        // String albumTableName = null;
+        // String photoTableName = null;
+        // String coverPhotoTableName = null;
+        // String tagTableName = null;
+            ResultSet rst = stmt.executeQuery("SELECT f.USER1_ID, u1.FIRST_NAME, u1.LAST_NAME, f.USER2_ID, u2.FIRST_NAME, u2.LAST_NAME " +
+                "FROM " + friendsTableName + " f, " + userTableName + " u1, " + userTableName + " u2, " + hometownCityTableName + " ht1, " + hometownCityTableName + " ht2 " +
+                "WHERE f.USER1_ID = u1.USER_ID " +
+                "AND f.USER2_ID = u2.USER_ID " +
+                "AND u1.USER_ID = ht1.USER_ID " +
+                "AND u2.USER_ID = ht2.USER_ID " +
+                "AND u1.USER_ID < u2.USER_ID " +
+                "AND u1.LAST_NAME = u2.LAST_NAME " +
+                "AND ht1.HOMETOWN_CITY_ID = ht2.HOMETOWN_CITY_ID " +
+                "AND ABS(u1.YEAR_OF_BIRTH - u2.YEAR_OF_BIRTH) < 10 " +
+                "ORDER BY f.USER1_ID, f.USER2_ID");
+
+            while (rst.next()) { 
+                Long user1_id = rst.getLong(1);
+                String user1FirstName = rst.getString(2);
+                String user1LastName = rst.getString(3);
+                Long user2_id = rst.getLong(4);
+                String user2FirstName = rst.getString(5);
+                String user2LastName = rst.getString(6);
+                SiblingInfo s = new SiblingInfo(user1_id, user1FirstName, user1LastName, user2_id, user2FirstName, user2LastName);
+                this.siblings.add(s);           
+            }
+
+            // Close statement and result set
+            rst.close();
+            stmt.close();
+        } catch (SQLException err) {
+            System.err.println(err.getMessage());
+        } 
     }
 
 }
