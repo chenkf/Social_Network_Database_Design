@@ -641,7 +641,7 @@ public class MyFakebookOracle extends FakebookOracle {
             ResultSet rst = stmt.executeQuery("CREATE VIEW all_friends_reversed AS SELECT DISTINCT * FROM(SELECT user1_id, user2_id FROM jiaqni.PUBLIC_FRIENDS UNION SELECT user2_id, user1_id FROM jiaqni.PUBLIC_FRIENDS)");
 
             rst = stmt.executeQuery("select * from(select u.user_id, u.FIRST_NAME, u.LAST_NAME from (select f.user2_id from all_friends_reversed f where f.user1_id = " + 
-                user_id + ") t1, " + userTableName + " u where t1.user2_id = u.user_id order by u.YEAR_OF_BIRTH desc, u.MONTH_OF_BIRTH desc, u.DAY_OF_BIRTH desc, u.user_id desc) where rownum = 1" );
+                user_id + ") t1, " + userTableName + " u where t1.user2_id = u.user_id order by u.YEAR_OF_BIRTH asc, u.MONTH_OF_BIRTH asc, u.DAY_OF_BIRTH asc, u.user_id desc) where rownum = 1" );
 
             while (rst.next()) { 
                 Long userId = rst.getLong(1);
@@ -651,7 +651,7 @@ public class MyFakebookOracle extends FakebookOracle {
             }
 
             rst = stmt.executeQuery("select * from(select u.user_id, u.FIRST_NAME, u.LAST_NAME from (select f.user2_id from all_friends_reversed f where f.user1_id = " + 
-                user_id + ") t1, " + userTableName + " u where t1.user2_id = u.user_id order by u.YEAR_OF_BIRTH asc, u.MONTH_OF_BIRTH asc, u.DAY_OF_BIRTH asc, u.user_id asc) where rownum = 1" );
+                user_id + ") t1, " + userTableName + " u where t1.user2_id = u.user_id order by u.YEAR_OF_BIRTH desc, u.MONTH_OF_BIRTH desc, u.DAY_OF_BIRTH desc, u.user_id asc) where rownum = 1" );
 
             while (rst.next()) { 
                 Long userId = rst.getLong(1);
