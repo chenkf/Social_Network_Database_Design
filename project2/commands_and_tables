@@ -1,0 +1,27 @@
+javac project2/FakebookOracle.java project2/MyFakebookOracle.java project2/TestFakebookOracle.java project2/TestFakebookOracleFull.java
+
+java -Xmx64M -cp "project2/ojdbc6.jar:" project2/TestFakebookOracle
+
+
+java -Xmx64M -cp "project2/ojdbc6.jar:" project2/TestFakebookOracleFull
+
+
+jiaqni.PUBLIC_USERS
+jiaqni.PUBLIC_FRIENDS
+jiaqni.PUBLIC_CITIES
+jiaqni.PUBLIC_PROGRAMS
+jiaqni.PUBLIC_USER_CURRENT_CITY
+jiaqni.PUBLIC_USER_HOMETOWN_CITY
+jiaqni.PUBLIC_EDUCATION
+jiaqni.PUBLIC_USER_EVENTS
+jiaqni.PUBLIC_PHOTOS
+jiaqni.PUBLIC_ALBUMS
+jiaqni.PUBLIC_TAGS
+
+
+
+drop view all_friends;
+drop view mutual_friends;
+drop view top_n;
+drop view top_n_mutual_friends;
+drop view results;

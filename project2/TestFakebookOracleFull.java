@@ -17,8 +17,8 @@ public class TestFakebookOracleFull {
 	static final TimeUnit TO_UNIT = TimeUnit.SECONDS;
 	
 	static String dataType = "PUBLIC"; 
-	static String oracleUserName = "chenkf"; //replace with your Oracle account name
-	static String password = "America2013"; //replace with your Oracle password
+	static String oracleUserName = "imgao"; //replace with your Oracle account name
+	static String password = "Mrunning88"; //replace with your Oracle password
 
 	static FakebookOracle fbwz;
 	static OutputStreamWriter out;
