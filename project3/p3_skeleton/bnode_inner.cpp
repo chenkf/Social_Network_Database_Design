@@ -27,7 +27,7 @@ Bnode_inner* Bnode_inner::split(VALUETYPE& output_val, VALUETYPE insert_value, B
     assert(num_values == BTREE_FANOUT-1); // only split when it's full!
 
     // Populate an intermediate array with all the values/children before splitting - makes this simpler
-    vector<VALUETYPE> all_values(values, values + num_values);
+    vector<VALUETYPE> all_values(values, values + num_values); //initialize vector 
     vector<Bnode*> all_children(children, children + num_children);
 
     // Insert the value that created the split

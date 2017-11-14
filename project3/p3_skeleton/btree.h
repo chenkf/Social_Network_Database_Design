@@ -76,7 +76,7 @@ public:
     bool isValid();
 
 
-    friend std::ostream& operator<< (std::ostream& os, const Btree& tree);
+    friend std::ostream& operator<< (std::ostream& os, const Btree& tree); //gives access to all of Btree's private member vars. More here: http://en.cppreference.com/w/cpp/language/friend
 
 private:
     Bnode* root;

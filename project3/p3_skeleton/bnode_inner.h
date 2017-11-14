@@ -27,7 +27,7 @@
 //
 // Inner Btree node
 //
-class Bnode_inner : public Bnode {
+class Bnode_inner : public Bnode { //inherits from Bnode (bnode.h)
 public:
     Bnode_inner() : Bnode(), num_values(0), num_children(0) {}
 
