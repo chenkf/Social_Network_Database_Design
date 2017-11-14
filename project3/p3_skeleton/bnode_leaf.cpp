@@ -7,6 +7,9 @@ Bnode_leaf::~Bnode_leaf() {
 
 }
 
+// Merges this object with rhs
+// Inputs:  The other leaf node this node should be merged with
+// Output:  The value that should be removed from the parent node
 VALUETYPE Bnode_leaf::merge(Bnode_leaf* rhs) {
     assert(num_values + rhs->getNumValues() < BTREE_LEAF_SIZE);
     assert(rhs->num_values > 0);
@@ -23,9 +26,20 @@ VALUETYPE Bnode_leaf::merge(Bnode_leaf* rhs) {
     return retVal;
 }
 
+// Redistribute this object with rhs
+// Inputs:  The other leaf node this node should be redistirubted with
+// Output:  The value that was (or should be) written to the parent node
 VALUETYPE Bnode_leaf::redistribute(Bnode_leaf* rhs) {
     // TODO: Implement this
-    return -1;
+
+    // redistribute with siblings, redistribute with non-siblings, are they the same?
+    // assuming rhs is not empty
+    assert(rhs->num_values > 0);
+    for (int i = 0; i + 1 < num_values; ++i) {
+        insert(rhs->getData(i));
+        remove(next->get(i));
+    }
+    return next->get(0);
 
 }
 

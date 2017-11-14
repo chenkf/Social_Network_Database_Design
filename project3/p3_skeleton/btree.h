@@ -81,7 +81,7 @@ public:
 private:
     Bnode* root;
     int size;
-
+    
     /*
     Some suggestions of member functions you may or may not might want to create
 
