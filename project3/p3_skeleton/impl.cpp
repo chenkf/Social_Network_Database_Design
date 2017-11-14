@@ -191,7 +191,7 @@ void Bnode_leaf::insert(VALUETYPE val) {
     // must insert in order
     int insert_idx = find_idx(val);
     for (int i = num_values; i > insert_idx; --i)
-        values[i] = values[i-1];
+        values[i] = values[i-1]; //Isabel comment: values in internal Bnode_leaf member var containing data vals  
     num_values++;
     values[insert_idx] = new Data(val);
 }

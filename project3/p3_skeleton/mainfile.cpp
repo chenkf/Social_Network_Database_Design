@@ -14,17 +14,17 @@ void small_test() {
     cout << btree << endl;
     btree.insert(0);
     btree.insert(2);
-    btree.insert(3);
-    cout << btree << endl;
-    btree.remove(0);
-    cout << btree << endl;
-    btree.remove(2);
-    cout << btree << endl;
-    btree.insert(2);
-    cout << btree << endl;
-    btree.insert(0);
-    cout << btree << endl;
-    btree.remove(2);
+    // btree.insert(3);
+    // cout << btree << endl;
+    // btree.remove(0);
+    // cout << btree << endl;
+    // btree.remove(2);
+    // cout << btree << endl;
+    // btree.insert(2);
+    // cout << btree << endl;
+    // btree.insert(0);
+    // cout << btree << endl;
+    // btree.remove(2);
     cout << btree << endl;
     cout << "###########################" << endl;
     assert(btree.isValid());
@@ -199,12 +199,12 @@ int main() {
                                             //values in constants.h to create the corresponding output
     
     small_test();
-    splitTestFromSpec();
-    testForRedistribution();
-    large_test1();
-    large_test2();
-    stress_insert(500);
-    stress_insert_delete(500);
+    // splitTestFromSpec();
+    // testForRedistribution();
+    // large_test1();
+    // large_test2();
+    // stress_insert(500);
+    // stress_insert_delete(500);
     
     return 0;
 }
