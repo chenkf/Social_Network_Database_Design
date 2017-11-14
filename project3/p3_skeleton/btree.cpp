@@ -49,6 +49,8 @@ bool Btree::insert(VALUETYPE value) {
         Bnode_leaf* split_node = leaf->split(value);
         Bnode_inner* parent = new Bnode_inner();
         split_node->parent = parent;
+        // leaf -> parent = parent;
+
         if (split_node -> parent -> getNumValues() < BTREE_LEAF_SIZE){
             // cout << "trying to create a parent node" << endl;
 
@@ -63,14 +65,31 @@ bool Btree::insert(VALUETYPE value) {
         // // } else{
         // //     split_node -> split(split_node->parent);
         // // }
-        // // Bnode_inner* inner = split_node -> values[0]
+            int idx = split_node -> parent -> insert(split_node->get(0));
+            split_node -> parent-> insert(split_node, idx);
+            split_node -> parent-> insert(leaf, idx);
+
+            // int idx = parent -> insert(split_node->get(0));
+            // // cout << split_node -> parent->getNumValues() << endl;
+            // parent-> insert(split_node, idx);
+            // parent-> insert(leaf, idx);
+            // cout << "get num_children" << leaf -> parent ->getNumChildren() << endl;
+            // cout << "get num_children" << split_node -> parent ->getNumChildren() << endl;
+            leaf -> parent = split_node -> parent;
+            root = split_node -> parent;
+            // root -> insert(leaf,idx)
+            // cout << "leaf -> parent: " << leaf -> parent << endl;
+            // cout << "split_node -> parent" << split_node << endl;
+            // cout << "root: " << root << endl;
+            // cout << *root << endl;
+        } else{
+            split_node -> split(split_node->parent);
         }
+        // // Bnode_inner* inner = split_node -> values[0]
     }
-
-
-
     return true;
 }
+
 
 bool Btree::remove(VALUETYPE value) {
     // TODO: Implement this
