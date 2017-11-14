@@ -47,21 +47,25 @@ bool Btree::insert(VALUETYPE value) {
     } else {
         // cout << "trying to insert 3..." << endl;
         Bnode_leaf* split_node = leaf->split(value);
-        split_node->parent = new Bnode_inner();
+        Bnode_inner* parent = new Bnode_inner();
+        split_node->parent = parent;
         if (split_node -> parent -> getNumValues() < BTREE_LEAF_SIZE){
             // cout << "trying to create a parent node" << endl;
 
-            int idx = split_node->parent->insert(split_node->get(0));
+            int idx = parent -> insert(split_node->get(0));
             // cout << split_node -> parent->getNumValues() << endl;
-            split_node -> parent -> insert(split_node, idx);
-            leaf -> parent = split_node -> parent;
-            cout << leaf -> parent->get(0) << endl;
+            parent -> insert(split_node, idx);
 
+            leaf -> parent = parent;
+            parent-> insert(leaf, idx);
+            // cout << leaf -> parent->get(0) << endl;
+            cout << "get num_children" << leaf -> parent ->getNumChildren() << endl;
+            cout << "get num_children" << split_node -> parent ->getNumChildren() << endl;
             // cout << split_node -> parent ->get(0) << endl;
             // cout << leaf->get(0) << endl;
             // cout << split_node->get(1) << endl;
             // cout << get(0) << endl;
-            root = split_node ->parent;
+            root = parent;
             // root -> insert(leaf,idx)
             cout << *root << endl;
         // // } else{
