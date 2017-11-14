@@ -14,7 +14,7 @@ void small_test() {
     cout << btree << endl;
     btree.insert(0);
     btree.insert(2);
-    // btree.insert(3);
+    btree.insert(3);
     // cout << btree << endl;
     // btree.remove(0);
     // cout << btree << endl;

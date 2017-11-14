@@ -1,5 +1,6 @@
 #include "bnode_leaf.h"
 
+// #include <iostream> //remove later
 using namespace std;
 
 Bnode_leaf::~Bnode_leaf() {
@@ -48,25 +49,28 @@ Bnode_leaf* Bnode_leaf::split(VALUETYPE insert_value) {
 
     // Do the actual split into another node
     Bnode_leaf* split_node = new Bnode_leaf;
-    for (int i = (BTREE_FANOUT/2) + 1; i < BTREE_LEAF_SIZE; ++i)
+    for (int i = (BTREE_FANOUT/2); i < BTREE_LEAF_SIZE; ++i){
         split_node->insert(values[i]);
-    num_values = BTREE_FANOUT/2
+    }
+    // num_values = BTREE_FANOUT/2;
 
-    if(insert_value<split_node[0]){
-        insert(insert_value) 
+    if(insert_value < split_node->get(0)){
+        insert(insert_value) ;
     }
     else{
-        split_node -> insert(insert_value)
+        split_node->insert(insert_value);
     }
+    // cout << split_node->get(1) << endl;
 
-    split_node -> parent = split_node -> values[0]
-    parent = split_node -> values[0]
-    split_node -> next = next -> next 
-    next -> prev = this
+
+    split_node->next = next;
+    split_node->prev = this;
+    next = split_node;
+    next->prev = split_node->next;
 
     // I like to do the asserts :)
     assert(num_values <= (BTREE_FANOUT/2)+1);
-    assert(split_node->getNumValues() == <= (BTREE_FANOUT/2)+1);
+    assert(split_node->getNumValues() <= (BTREE_FANOUT/2)+1);
 
     // split_node->parent = parent; // they are siblings
 

@@ -39,20 +39,38 @@ bool Btree::insert(VALUETYPE value) {
     // Found a leaf node
     Bnode_leaf* leaf = dynamic_cast<Bnode_leaf*>(current);
     assert(leaf);
+    assert(leaf->getNumValues()<= BTREE_LEAF_SIZE);
 
 
     if (leaf->getNumValues() < BTREE_LEAF_SIZE){
         leaf -> insert(value);
-    } else if (leaf->getNumValues() == BTREE_LEAF_SIZE){
-        Bnode_leaf* split_node = leaf -> split(value);
-        if (split_node -> parent -> getNumValues < BTREE_LEAF_SIZE){
-            idx = split_node -> parent -> find_value_gt(split_node -> get(0))
-            split_node -> parent -> insert(split_node, idx)
-        } else{
-            split_node -> split 
+    } else {
+        // cout << "trying to insert 3..." << endl;
+        Bnode_leaf* split_node = leaf->split(value);
+        split_node->parent = new Bnode_inner();
+        if (split_node -> parent -> getNumValues() < BTREE_LEAF_SIZE){
+            // cout << "trying to create a parent node" << endl;
+
+            int idx = split_node->parent->insert(split_node->get(0));
+            // cout << split_node -> parent->getNumValues() << endl;
+            split_node -> parent -> insert(split_node, idx);
+            leaf -> parent = split_node -> parent;
+            cout << leaf -> parent->get(0) << endl;
+
+            // cout << split_node -> parent ->get(0) << endl;
+            // cout << leaf->get(0) << endl;
+            // cout << split_node->get(1) << endl;
+            // cout << get(0) << endl;
+            root = split_node ->parent;
+            // root -> insert(leaf,idx)
+            cout << *root << endl;
+        // // } else{
+        // //     split_node -> split(split_node->parent);
+        // // }
+        // // Bnode_inner* inner = split_node -> values[0]
         }
-        // Bnode_inner* inner = split_node -> values[0]
     }
+
 
 
     return true;
