@@ -3,6 +3,13 @@
 
 using namespace std;
 
+
+
+// Merges this object with rhs
+// Input:   The other node that this object should be merged with
+//          The index in the parent node that contains the value that this merge operation should
+//          happen through
+// Output: The value that was (or should be) removed to the parent node
 VALUETYPE Bnode_inner::merge(Bnode_inner* rhs, int parent_idx) {
     assert(rhs->parent == parent); // can only merge siblings
     assert(rhs->num_values > 0);
@@ -12,6 +19,12 @@ VALUETYPE Bnode_inner::merge(Bnode_inner* rhs, int parent_idx) {
     return -1;
 }
 
+
+// Redistributes this object with rhs
+// Inputs:  The other node that this object should be redistributed with
+//          The index in the parent node that contains the value that this redistribution should
+//          happen through
+// Output:  The value that was/should be written to the parent node
 VALUETYPE Bnode_inner::redistribute(Bnode_inner* rhs, int parent_idx) {
     assert(rhs->parent == parent); // inner node redistribution should only happen with siblings
     assert(parent_idx >= 0);
@@ -22,7 +35,10 @@ VALUETYPE Bnode_inner::redistribute(Bnode_inner* rhs, int parent_idx) {
     return -1;
 }
 
-
+// Splits this object with rhs
+// Input:   The input node/value that caused this split
+// Output:  A heap-allocated Bnode_inner* that was created due to the split
+//          output_val should be the value that needs to be inserted in the parent node
 Bnode_inner* Bnode_inner::split(VALUETYPE& output_val, VALUETYPE insert_value, Bnode* insert_node) {
     assert(num_values == BTREE_FANOUT-1); // only split when it's full!
 

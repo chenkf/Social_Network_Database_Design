@@ -58,15 +58,7 @@ bool Btree::insert(VALUETYPE value) {
 
             leaf -> parent = parent;
             parent-> insert(leaf, idx);
-            // cout << leaf -> parent->get(0) << endl;
-            cout << "get num_children" << leaf -> parent ->getNumChildren() << endl;
-            cout << "get num_children" << split_node -> parent ->getNumChildren() << endl;
-            // cout << split_node -> parent ->get(0) << endl;
-            // cout << leaf->get(0) << endl;
-            // cout << split_node->get(1) << endl;
-            // cout << get(0) << endl;
             root = parent;
-            // root -> insert(leaf,idx)
             cout << *root << endl;
         // // } else{
         // //     split_node -> split(split_node->parent);
