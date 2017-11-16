@@ -27,6 +27,8 @@ void small_test() {
     btree.insert(8); //isabel add
     btree.insert(9);
     
+    
+    
 //     cout << btree << endl;
     // btree.remove(0);
     // cout << btree << endl;
@@ -40,6 +42,11 @@ void small_test() {
     cout << btree << endl;
     cout << "###########################" << endl;
     assert(btree.isValid());
+    
+    std::vector<Data*> returnValues = btree.search_range(4, 8);
+    for (int i = 0; i < returnValues.size(); i++ ) {
+        cout << returnValues[i]->value << endl;
+    }
 }
 
 //Test the spec example which is related to split

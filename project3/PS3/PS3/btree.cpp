@@ -132,6 +132,38 @@ bool Btree::remove(VALUETYPE value) {
 vector<Data*> Btree::search_range(VALUETYPE begin, VALUETYPE end) {
     std::vector<Data*> returnValues;
     // TODO: Implement this
+    assert(root); //Isabel comment: root is private Btree member var of type Bnode*
+    Bnode* current = root;
+    
+    
+    Bnode_inner* inner = dynamic_cast<Bnode_inner*>(current); //Isabel comment: will return nullptr if not polymorphically a Bnode_inner*
+    // A dynamic cast <T> will return a nullptr if the given input is polymorphically a T
+    //                    will return a upcasted pointer to a T* if given input is polymorphically a T
+    
+    // Have not reached a leaf node yet
+    while (inner) {
+        int find_index = inner->find_value_gt(begin); //Isabel comment: find index that is just larger than the index we want
+        current = inner->getChild(find_index);
+        inner = dynamic_cast<Bnode_inner*>(current); //Isabel comment: nullptr evaluates to false, so when there are no more inner nodes to iterate through, break loop
+    }
+    
+    // Found a leaf node
+    Bnode_leaf* leaf = dynamic_cast<Bnode_leaf*>(current);
+    assert(leaf);
+    
+    int i = 0;
+    while (i < leaf->getNumValues() && leaf->get(i) <= end) {
+        if (begin <= leaf->get(i)) returnValues.push_back(leaf->getData(i));
+        i++;
+    }
+    while ( leaf->next && leaf->next->get(0) <= end ) {
+        leaf = leaf->next;
+        i = 0;
+        while (i < leaf->getNumValues() && leaf->get(i) <= end) {
+            returnValues.push_back(leaf->getData(i));
+            i++;
+        }
+    }
     
     return returnValues;
 }
