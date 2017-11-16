@@ -1,7 +1,8 @@
 #include "bnode_leaf.h"
 #include "bnode_inner.h" //added this
+#include <vector>
 
-#include<iostream>
+#include <iostream>
 // #include <iostream> //remove later
 using namespace std;
 
@@ -13,6 +14,11 @@ Bnode_leaf::~Bnode_leaf() {
 // Merges this object with rhs
 // Inputs:  The other leaf node this node should be merged with
 // Output:  The value that should be removed from the parent node
+// Kai's note: move all values from rhs to lhs, adjust next/prev pointers
+// yet to be done:
+// 1. update least common ancestors of
+// 2. delete smallest key of rhs's parent
+// 3. shift slots of rhs's parent to the left
 VALUETYPE Bnode_leaf::merge(Bnode_leaf* rhs) {
     assert(num_values + rhs->getNumValues() < BTREE_LEAF_SIZE); //because if this is not true, then we could've done a redistribute (preferred)
     assert(rhs->num_values > 0);
@@ -38,18 +44,36 @@ VALUETYPE Bnode_leaf::merge(Bnode_leaf* rhs) {
 // Redistribute this object with rhs
 // Inputs:  The other leaf node this node should be redistirubted with
 // Output:  The value that was (or should be) written to the parent node
+// Kai's note: redistribute but not yet update least common ancestor's key
 VALUETYPE Bnode_leaf::redistribute(Bnode_leaf* rhs) {
     // TODO: Implement this
     
-    // redistribute with siblings, redistribute with non-siblings, are they the same?
-    // assuming rhs is not empty
-    assert(rhs->num_values > 0);
-    for (int i = 0; i + 1 < num_values; ++i) {
-        insert(rhs->getData(i));
-        remove(next->get(i));
-    }
-    return next->get(0);
+//    // redistribute with siblings, redistribute with non-siblings, are they the same?
     
+//    VALUETYPE lhs_largest = get(num_values-1);
+//    int parent_key_idx = parent -> find_value_gt(lhs_largest);
+    // use a temp vector to contain values from lhs and rhs
+    vector<Data*> temp(2 * BTREE_LEAF_SIZE);
+    for (int i = 0; i < num_values; i++) {
+        temp[i] = values[i];
+    }
+    for (int i = 0; i < rhs->num_values; i++) {
+        temp[i] = rhs->values[i];
+    }
+    
+    // redistribute half the values in temp to this
+    clear();
+    for (int i = 0; i < (num_values+rhs->num_values)/2; i++) {
+        values[i] = temp[i];
+        num_values += 1;
+    }
+    next -> clear();
+    for (int i = (num_values+rhs->num_values)/2; i < num_values+rhs->num_values; i++) {
+        next->values[i] = temp[i];
+        next->num_values += 1;
+    }
+    
+    return next -> get(0);
 }
 
 Bnode_leaf* Bnode_leaf::split(VALUETYPE insert_value) {
