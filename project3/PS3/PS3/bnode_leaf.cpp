@@ -61,7 +61,16 @@ Bnode_leaf* Bnode_leaf::split(VALUETYPE insert_value) {
     for (int i = (BTREE_FANOUT/2); i < BTREE_LEAF_SIZE; ++i){
         split_node->insert(values[i]);
     }
-//    num_values = BTREE_FANOUT/2; //change num_values of this node so that split values are no longer considered 
+    
+    Bnode_leaf* temp_store_node = new Bnode_leaf;
+    for (int i = 0; i < (BTREE_FANOUT/2); ++i){
+        temp_store_node->insert(values[i]);
+    }
+//    num_values = BTREE_FANOUT/2; //change num_values of this node so that split values are no longer considered
+    clear();
+    for (int i = 0; i < temp_store_node->getNumValues(); ++i){
+        insert(temp_store_node->values[i]) ;
+    }
     
     if(insert_value < split_node->get(0)){
         insert(insert_value) ;
@@ -69,8 +78,8 @@ Bnode_leaf* Bnode_leaf::split(VALUETYPE insert_value) {
     else{
         split_node->insert(insert_value);
 
-        num_values = BTREE_FANOUT/2; //change num_values of this node so that split values are no longer considered
-        cout << "inserting value..."<< insert_value << " lhs num_values..." << num_values << " rhs_num_values..." << split_node -> num_values << endl;
+//        num_values = BTREE_FANOUT/2; //change num_values of this node so that split values are no longer considered
+//        cout << "inserting value..."<< insert_value << " lhs num_values..." << num_values << " rhs_num_values..." << split_node -> num_values << endl;
     }
     
     
