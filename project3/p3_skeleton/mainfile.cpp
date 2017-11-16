@@ -15,6 +15,11 @@ void small_test() {
     btree.insert(0);
     btree.insert(2);
     btree.insert(3);
+    btree.insert(4); // Kai's test cases
+    btree.insert(5); // Kai's test cases
+    // btree.insert(6); // Kai's test cases
+    // btree.insert(7); // Kai's test cases
+
     // cout << btree << endl;
     // btree.remove(0);
     // cout << btree << endl;

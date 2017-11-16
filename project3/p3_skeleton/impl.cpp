@@ -130,10 +130,14 @@ int Bnode_inner::find_value_gt(VALUETYPE value) const {
 
 
 int Bnode_inner::insert(VALUETYPE value) {
+    // check the number of values is not full
     assert(num_values < BTREE_FANOUT-1); // node is full
+    // find the index whose key is greater than value
     int idx = find_value_gt(value);
+    // check the index is <= number of values
     assert(idx <= num_values);
     for (int i = num_values; i > idx; --i)
+        // shifrt the rhs of idx to the right by 1 position
         values[i] = values[i-1];
     values[idx] = value;
     num_values++;
@@ -141,8 +145,10 @@ int Bnode_inner::insert(VALUETYPE value) {
 }
 
 int Bnode_inner::insert(Bnode* child, int idx) {
+    // check the number of children is not full
     assert(num_children < BTREE_FANOUT); // node is full
     for (int i = num_children; i > idx; --i)
+        // shifrt the rhs of idx to the right by 1 position
         children[i] = children[i-1];
     children[idx] = child;
     num_children++;
