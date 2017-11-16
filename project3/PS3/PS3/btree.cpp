@@ -43,9 +43,6 @@ bool Btree::insert(VALUETYPE value) {
     assert(leaf->getNumValues()<= BTREE_LEAF_SIZE);
     Bnode_inner* old_parent = leaf -> parent;
     
-    if (value == 6){
-        cout << old_parent << endl;
-    }
     
     if (leaf->getNumValues() < BTREE_LEAF_SIZE){ //if leaf node not full
         leaf -> insert(value);
@@ -58,7 +55,6 @@ bool Btree::insert(VALUETYPE value) {
         
         // Condition 1: if root
         if (!old_parent){
-
             Bnode_inner* root_parent = new Bnode_inner();
             root_parent -> insert(split_node -> get(0));
             root_parent -> insert(split_node, 0);
@@ -73,7 +69,7 @@ bool Btree::insert(VALUETYPE value) {
         
         // Condition 2a: check if we will need to do bnode_innser -> split()
         bool at_root = false;
-        if (old_parent -> getNumValues() < BTREE_LEAF_SIZE){ //if parent node not full
+        if (old_parent -> getNumValues() < BTREE_FANOUT-1){ //if parent node not full
             VALUETYPE new_parent_val = split_node -> get(0);
             cout << "Inserting new leaf value to inner node..." << new_parent_val << endl;
             int idx = old_parent -> insert(new_parent_val);
@@ -83,27 +79,17 @@ bool Btree::insert(VALUETYPE value) {
 
         }
         else{ //parent node full
-            cout << "Adding test case 6..." << endl;
             VALUETYPE temp_output_val = 0;
             Bnode_inner* rhs_node = nullptr;
 
             Bnode* insert_node = split_node;
             VALUETYPE insert_value = split_node->get(0);
-            while(old_parent -> getNumValues() == BTREE_LEAF_SIZE){ //while split node parent is full
-                
-//                if (root == old_parent){
-//                    Bnode_inner* new_root = new Bnode_inner();
-//                    int new_root_idx = new_root -> insert(temp_output_val);
-//                    new_root -> insert(insert_split_node, new_root_idx);
-//                    root = new_root;
-//                }
-//                cout << "temp_output_val_before " << temp_output_val << endl;
-                
+            while(old_parent -> getNumValues() == BTREE_FANOUT-1){ //while split node parent is full
+                at_root = false;
+
                 rhs_node = old_parent -> split(temp_output_val, insert_value, insert_node);
-//                cout << "temp_output_val_after " << temp_output_val << endl;
                 insert_node = rhs_node;
                 insert_value = temp_output_val;
-//                insert_value = rhs_node->get(0);
                 if(old_parent->parent){
                     at_root = true;
                     old_parent = old_parent -> parent;
@@ -112,10 +98,11 @@ bool Btree::insert(VALUETYPE value) {
             if(at_root){
                 int idx_2 = old_parent -> insert(temp_output_val);
                 old_parent -> insert(rhs_node, idx_2+1);
-                root = old_parent;
+                if (!old_parent->parent){
+                    root = old_parent;
+                }
             }
             else{
-                cout << "making it here" << endl;
                 Bnode_inner* new_root = new Bnode_inner();
                 new_root -> insert(temp_output_val);
                 new_root -> insert(rhs_node,0);
